@@ -48,7 +48,7 @@ char *_getline(const int fd)
 	}
 	return (line);
 }
-/** 
+/**
  * read_buf - reads into the buffer
  * @fb: the fd buf struct
  *
@@ -110,7 +110,7 @@ FdBuf *get_fdbuf(FdBuf *head, const int fd)
 
 	if (!head->buf && !head->fd && !head->next)
 	{
-		head->buf =NULL;
+		head->buf = NULL;
 		head->fd = fd;
 		return (head);
 	}
