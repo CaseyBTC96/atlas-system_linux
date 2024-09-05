@@ -46,7 +46,7 @@ char *_getline(const int fd)
  */
 char *read_buf(FdBuf *fb)
 {
-	char_buf[READ_SIZE + 1], *p, *line;
+	char buf[READ_SIZE + 1], *p, *line;
 	ssize_t r = 0;
 
 	p = __strchr(fb->buf + fb->i, '\n', fb->len - fb->i):
