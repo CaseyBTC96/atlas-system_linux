@@ -9,6 +9,8 @@
 char *_getline(const int fd)
 {
 	static FdBuf head;
+	static char buf[READ_SIZE + 1];
+	static size_t len;
 	FdBuf *fb = NULL, *temp;
 	char *line = NULL;
 
