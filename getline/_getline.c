@@ -66,7 +66,7 @@ char *read_buf(FdBuf *fb)
 			if (!fb->buf)
 				return (NULL);
 			memcpy(fb->buf + fb->len, buf, r), fb->len += r;
-			p = __strchr(fb->buf + (fb->len - r), '\n', r);
+			p = _strchr(fb->buf + (fb->len - r), '\n', r);
 			if (p)
 			{
 				fb->buf[fb->len] = 0;
