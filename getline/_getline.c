@@ -49,7 +49,7 @@ char *read_buf(FdBuf *fb)
 	char buf[READ_SIZE + 1], *p, *line;
 	ssize_t r = 0;
 
-	p = __strchr(fb->buf + fb->i, '\n', fb->len - fb->i):
+	p = _strchr(fb->buf + fb->i, '\n', fb->len - fb->i):
 		if (!fb->len || fb->i >= fb->len || !p)
 	{
 		while (1)
@@ -132,7 +132,7 @@ FdBuf *get_fdbuf(FdBuf *head, const int fd)
  *@size: number of bytes to search
  *Return: (s) a pointer to the memory area s
  */
-char *__strchr(char *s, char c, ssize_t size)
+char *_strchr(char *s, char c, ssize_t size)
 {
 	if (!s)
 		return (NULL);
