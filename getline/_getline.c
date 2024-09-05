@@ -62,7 +62,7 @@ char *read_buf(FdBuf *fb)
 				p = fb->buf + fb->len;
 				break;
 			}
-			fb->buf = *_realloc(fb->buf, fb->len, fb->len + r + 1);
+			fb->buf = _realloc(fb->buf, fb->len, fb->len + r + 1);
 			if (!fb->buf)
 				return (NULL);
 			memcpy(fb->buf + fb->len, buf, r), fb->len += r;
