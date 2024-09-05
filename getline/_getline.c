@@ -1,4 +1,4 @@
-#include "_getltine.h"
+#include "_getline.h"
 
 /**
  * _getline - gets a line of chars from a file descripor
