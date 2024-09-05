@@ -19,25 +19,33 @@ char *_getline(const int fd)
 		for (fb = head.next; fb;)
 		{
 			if (fb->buf)
-			{
-				free(fb->buf);
-				fb->buf = NULL;
-			}
+				fb->buf = (free(fb->buf), NULL);
 			temp = fb;
 			fb = fb->next;
 			free(temp);
 		}
-		memset(&head, 0, sizeof(head));
+		memset(&head, 0, sizeof(head)), memset(buf, 0, len), len = 0;
 		return (NULL);
 	}
 	fb = get_fdbuf(&head, fd);
+	if ((fb == &head) && len)
+	{
+		fb->buf = malloc(len + 1);
+		if (!fb->buf)
+			return (NULL);
+		memcpy(fb->buf, buf, fb->len = len);
+		len = 0;
+	}
 	if (fb)
 		line = read_buf(fb);
-	if (line && line[0] == '\n' && !line[1])
-		line[0]  = 0;
+	if ((fb == &head) && fb->buf)
+	{
+		memcpy(buf, fb->buf + fb->i, len = fb->len - fb->i);
+		fb->buf = (free(fb->buf), NULL);
+		fb->len = fb->i = 0;
+	}
 	return (line);
 }
-
 /** 
  * read_buf - reads into the buffer
  * @fb: the fd buf struct
@@ -100,28 +108,36 @@ FdBuf *get_fdbuf(FdBuf *head, const int fd)
 
 	if (!head->buf && !head->fd && !head->next)
 	{
+		head->buf =NULL;
 		head->fd = fd;
+		return (head);
+	}
+	else if (fd < head->fd) /* need to copy head over and replace */
+	{
+		node = malloc(sizeof(*node));
+		if (!node)
+			return (NULL);
+		memcpy(node, head, sizeof(*head));
+		memset(head, 0, sizeof(*head));
+		head->buf = NULL;
+		head->fd = fd;
+		head->next = node;
 		return (head);
 	}
 	for (; head->next && head->next->fd <= fd; head = head->next)
 		;
 	if (head->fd == fd)
+	{
 		return (head);
+	}
 	node = malloc(sizeof(*node));
 	if (!node)
 		return (NULL);
-	if (fd < head->fd) /* need to copy head over and replace */
-	{
-		memcpy(node, head, sizeof(*head));
-		memset(head, 0, sizeof(*head));
-		head->fd = fd;
-		head->next = node;
-		return (head);
-	}
-	memset(node, 0, sizeof(*node));
+	memset(head, 0, sizeof(*head));
+	node->buf = NULL;
 	node->fd = fd;
 	node->next = head->next;
-	head->next = node;
+	node->next = node;
 	return (node);
 }
 
@@ -142,4 +158,34 @@ char *_strchr(char *s, char c, ssize_t size)
 		s++;
 	} while (--size > 0);
 	return (NULL);
+}
+
+/**
+ * _realloc - reallocates a block of memory
+ * @ptr: pointer to previous malloc'ated block
+ * @old_size: byte size of previous block
+ * @new_size: byte size of new block
+ *
+ * Return: pointer to da ol'block nameen.
+ */
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
+{
+	char *p;
+
+	if (!ptr)
+		return (malloc(new_size));
+	if (!new_size)
+		return (free(ptr), NULL);
+	if (new_size == old_size)
+		return (ptr);
+
+	p = malloc(new_size);
+	if (!p)
+		return (NULL);
+
+	old_size = old_size < new_size ? old_size : new_size;
+	while (old_size--)
+		p[old_size] = ((char *)ptr)[old_size];
+	free(ptr);
+	return (p);
 }
