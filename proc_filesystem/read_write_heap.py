@@ -57,11 +57,6 @@ for line in maps_file:
     device = sline[3]
     inode = sline[4]
     pathname = sline[-1][:-1]
-    print("\tpathname = {}".format(pathname))
-    print("\taddresses = {}".format(addr))
-    print("\tpermisions = {}".format(perm))
-    print("\toffset = {}".format(offset))
-    print("\tinode = {}".format(inode))
 
     # check if there is read and write permission
     if perm[0] != 'r' or perm[1] != 'w':
@@ -75,7 +70,6 @@ for line in maps_file:
         exit(1)
     addr_start = int(addr[0], 16)
     addr_end = int(addr[1], 16)
-    print("\tAddr start [{:x}] | end [{:x}]".format(addr_start, addr_end))
 
     # open and read mem
     try:
