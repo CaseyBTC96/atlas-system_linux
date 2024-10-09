@@ -47,7 +47,6 @@ for line in maps_file:
     # check if we found the heap
     if sline[-1][:-1] != "[heap]":
         continue
-    print("[*] Found [heap]:")
 
     # parse line
     addr = sline[0]
@@ -93,9 +92,6 @@ for line in maps_file:
     maps_file.close()
     mem_file.close()
 
-    # output only "SUCCESS!" as expected
-
-    print("SUCCESS!") 
 
     # there is only one heap in our example
     break
