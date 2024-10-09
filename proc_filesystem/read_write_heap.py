@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-'''             
+'''
 Locates and replaces the first occurrence of a string in the heap
-of a process    
+of a process
 
 Usage: ./read_write_heap.py PID search_string replace_by_string
-Where:           
+Where:
 - PID is the pid of the target process
 - search_string is the ASCII string you are looking to overwrite
 - replace_by_string is the ASCII string you want to replace
@@ -13,9 +13,11 @@ Where:
 
 import sys
 
+
 def print_usage_and_exit():
     print('Usage: {} pid search write'.format(sys.argv[0]))
     sys.exit(1)
+
 
 # check usage
 if len(sys.argv) < 3 or len(sys.argv) > 4:
@@ -26,7 +28,7 @@ pid = int(sys.argv[1])
 if pid <= 0:
     print_usage_and_exit()
 search_string = str(sys.argv[2])
-if search_string  == "":
+if search_string == "":
     print_usage_and_exit()
 if len(sys.argv) == 4:
     write_string = str(sys.argv[3])
@@ -46,6 +48,7 @@ except IOError as e:
 
 for line in maps_file:
     sline = line.split(' ')
+
     # check if we found the heap
     if sline[-1][:-1] != "[heap]":
         continue
@@ -65,7 +68,7 @@ for line in maps_file:
 
     # get start and end of the heap in the virtual memory
     addr = addr.split("-")
-    if len(addr) != 2: # never trust anyone, not even your OS :)
+    if len(addr) != 2:  # never trust anyone, not even your OS :)
         maps_file.close()
         exit(1)
     addr_start = int(addr[0], 16)
