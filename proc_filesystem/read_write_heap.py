@@ -92,9 +92,6 @@ for line in maps_file:
     maps_file.close()
     mem_file.close()
 
-    # output only "SUCCESS!" 
-    print("SUCCESS!")
-
 
     # there is only one heap in our example
     break
