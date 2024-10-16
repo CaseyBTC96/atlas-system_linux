@@ -35,7 +35,7 @@ void print_program_32(FILE *file)
 	Elf32_Shdr section;
 	Elf32_Shdr str_table;
 	int i, j;
-	unsigned long int position, upper;
+	unsigned long int position, upper, lower;
 	char *names, *interp;
 
 	(void)names;
@@ -43,6 +43,12 @@ void print_program_32(FILE *file)
 	if (header.e_ident[EI_DATA] == ELFDATA2MSB)
 		flip32_0(&header);
 	fseek(file, (unsigned int)header.e_phoff, SEEK_SET);
+
+	if (header.e_phnum == 0)
+	{
+		printf("\nThere are no program headers in this file.\n");
+		return;
+	}
 
 	printf("\nElf file type is ");
 	if (header.e_type == ET_REL)
@@ -82,6 +88,8 @@ void print_program_32(FILE *file)
 			printf("  GNU_STACK      ");
 		else if (program.p_type == PT_GNU_RELRO)
 			printf("  GNU_RELRO      ");
+		else if (program.p_type == 0x6464e550)
+			printf("  LOOS+464e550   ");
 		else
 			printf("  UNKNOWN        ");
 		printf("0x%06x ", (unsigned int)program.p_offset);
@@ -101,7 +109,9 @@ void print_program_32(FILE *file)
 			printf("E ");
 		else
 			printf("  ");
-		printf("0x%x\n", (unsigned int)program.p_align);
+		if (program.p_align > 0)
+			printf("0x");
+		printf("%x\n", (unsigned int)program.p_align);
 		if (program.p_type == PT_INTERP)
 		{
 			position = ftell(file);
@@ -137,12 +147,12 @@ void print_program_32(FILE *file)
 			fread(&section, sizeof(section), 1, file);
 			if (header.e_ident[EI_DATA] == ELFDATA2MSB)
 				flip32_1(&section);
-			if (section.sh_addr == 0)
+			if (section.sh_addr == 0 || section.sh_size == 0)
 				continue;
-			upper = program.p_offset + program.p_memsz;
-			if (section.sh_offset >= program.p_offset && section.sh_offset < upper)
+			lower = section.sh_offset;
+			upper = section.sh_offset + section.sh_size;
+			if (lower >= program.p_offset && upper <= program.p_offset + program.p_memsz)
 				printf("%s ", names + section.sh_name);
-
 		}
 		printf("\n");
 		fseek(file, position, SEEK_SET);
@@ -158,13 +168,19 @@ void print_program_64(FILE *file)
 	Elf64_Shdr section;
 	Elf64_Shdr str_table;
 	int i, j;
-	unsigned long int position, upper;
-	char *names;
+	unsigned long int position, upper, lower;
+	char *names, *interp;
 
 	fread(&header, sizeof(header), 1, file);
 	if (header.e_ident[EI_DATA] == ELFDATA2MSB)
 		flip64_0(&header);
 	fseek(file, (unsigned int)header.e_phoff, SEEK_SET);
+
+	if (header.e_phnum == 0)
+	{
+		printf("\nThere are no program headers in this file.\n");
+		return;
+	}
 
 	printf("\nElf file type is ");
 	if (header.e_type == ET_REL)
@@ -223,9 +239,20 @@ void print_program_64(FILE *file)
 			printf("E ");
 		else
 			printf("  ");
-		printf("0x%lx\n", (unsigned long int)program.p_align);
+		if (program.p_align > 0)
+			printf("0x");
+		printf("%lx\n", (unsigned long int)program.p_align);
 		if (program.p_type == PT_INTERP)
-			printf("      [Requesting program interpreter: %s]\n", (char *)program.p_vaddr);
+		{
+			position = ftell(file);
+			interp = malloc(sizeof(char) * program.p_filesz); /* malloc error unhandled */
+			fseek(file, (unsigned long int)program.p_offset, SEEK_SET);
+			fread(interp, program.p_filesz, 1, file);
+			printf("      [Requesting program interpreter: %s]\n", interp);
+			fseek(file, position, SEEK_SET);
+			free(interp);
+		}
+
 	}
 
 	fseek(file, (unsigned int)header.e_shoff + sizeof(section) * (unsigned int)header.e_shstrndx, SEEK_SET);
@@ -251,12 +278,12 @@ void print_program_64(FILE *file)
 			fread(&section, sizeof(section), 1, file);
 			if (header.e_ident[EI_DATA] == ELFDATA2MSB)
 				flip64_1(&section);
-			if (section.sh_addr == 0)
+			if (section.sh_addr == 0 || section.sh_size == 0)
 				continue;
-			upper = program.p_offset + program.p_memsz;
-			if (section.sh_offset >= program.p_offset && section.sh_offset < upper)
+			lower = section.sh_offset;
+			upper = section.sh_offset + section.sh_size;
+			if (lower >= program.p_offset && upper <= program.p_offset + program.p_memsz)
 				printf("%s ", names + section.sh_name);
-
 		}
 		printf("\n");
 		fseek(file, position, SEEK_SET);
