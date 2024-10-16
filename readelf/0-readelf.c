@@ -17,9 +17,9 @@ int main(int ac, char **av)
 		fread(&magic, sizeof(magic), 1, file);
 		fseek(file, 0, SEEK_SET);
 		if (magic[EI_CLASS] == ELFCLASS32)
-			printElf_32(file);
+			print_elf_32(file);
 		else if (magic[EI_CLASS] == ELFCLASS64)
-			printElf_64(file);
+			print_elf_64(file);
 	}
 
 	fclose(file);
@@ -27,7 +27,7 @@ int main(int ac, char **av)
 	return (0);
 }
 
-void printElf_32(FILE *file)
+void print_elf_32(FILE *file)
 {
 	Elf32_Ehdr header;
 	int i;
@@ -156,7 +156,7 @@ void printElf_32(FILE *file)
 	printf("  Section header string table index: %u\n", (unsigned int)header.e_shstrndx);
 }
 
-void printElf_64(FILE *file)
+void print_elf_64(FILE *file)
 {
 	Elf64_Ehdr header;
 	int i;
@@ -171,18 +171,16 @@ void printElf_64(FILE *file)
 	printf(" \n");
 	/* Class */
 	printf("  Class:                             ");
-	if (header.e_ident[EI_CLASS] == ELFCLASS32)
-		printf("ELF32\n");
-	else if (header.e_ident[EI_CLASS] == ELFCLASS64)
-		printf("ELF64\n"); /* confirmed */
-	else
-		printf("UNKNOWN\n");
+	printf("ELF64\n"); /* confirmed */
 	/* Data */
 	printf("  Data:                              ");
 	if (header.e_ident[EI_DATA] == ELFDATA2LSB)
 		printf("2's complement, little endian\n"); /* confirmed */
 	else if (header.e_ident[EI_DATA] == ELFDATA2MSB)
+	{
 		printf("2's complement, big endian\n");
+		flip64_0(&header);
+	}
 	else
 		printf("UNKNOWN\n");
 	/* Version */
