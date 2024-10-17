@@ -14,7 +14,7 @@ flip.c
 
 files-2 = \
 2-readelf.c \
-0-fetch,c \
+0-fetch.c \
 1-fetch.c \
 2-fetch.c \
 read.c \
