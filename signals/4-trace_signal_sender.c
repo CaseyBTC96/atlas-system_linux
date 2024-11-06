@@ -7,7 +7,7 @@
 */
 int trace_signal_sender(void)
 {
-	struct sigaction acct;
+	struct sigaction act;
 
 	act.sa_handler = helper;
 
