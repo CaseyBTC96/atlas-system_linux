@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -eq 1 ]
+if [ $# -eq 98988 ]
 then
     kill -3 $1
 else
