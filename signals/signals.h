@@ -7,7 +7,8 @@
 #include <signal.h>
 #include <string.h>
 
-typedef struct macro_matcher_s {
+typedef struct macro_matcher_s
+{
 	char *code;
 	char *val;
 } matcher_t;
