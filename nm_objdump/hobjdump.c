@@ -7,6 +7,21 @@
 #include "hobjdump.h"
 
 
+
+#include <stdio.h>
+
+void print_flag(int *flag_printed, unsigned long flags, unsigned long flag,
+				const char *flag_name)
+{
+	if (flags & flag)
+	{
+		if (*flag_printed)
+			printf(", ");
+		printf("%s", flag_name);
+		*flag_printed = 1;
+	}
+}
+
 void print_elf_header(Elf64_Ehdr *ehdr, const char *filename)
 {
 	const char *formatted_filename = filename;
@@ -16,58 +31,31 @@ void print_elf_header(Elf64_Ehdr *ehdr, const char *filename)
 	if (formatted_filename[0] == '.' && formatted_filename[1] == '/')
 		formatted_filename += 2;
 	printf("%s:     file format elf64-x86-64\n", formatted_filename);
+
 	if (ehdr->e_machine == EM_X86_64)
 		printf("architecture: i386:x86-64");
+
 	if (ehdr->e_type == ET_EXEC)
 		flags_interp |= EXEC_P;
 	if (ehdr->e_type == ET_REL)
 		flags_interp |= HAS_RELOC;
 	if (ehdr->e_type == ET_DYN)
 		flags_interp |= DYNAMIC;
-	if (ehdr->e_shnum > 0)
-		flags_interp |= HAS_SYMS;
-	if (ehdr->e_phnum > 0)
-		flags_interp |= D_PAGED;
+
+	flags_interp |= (ehdr->e_shnum > 0) ? HAS_SYMS : 0;
+	flags_interp |= (ehdr->e_phnum > 0) ? D_PAGED : 0;
+
 	printf(" flags 0x%08lx:\n", flags_interp);
 
-	if (ehdr->e_type == ET_EXEC)
-	{
-		printf("EXEC_P");
-		flag_printed = 1;
-	}
-	if (ehdr->e_type == ET_REL)
-	{
-		if (flag_printed)
-			printf(", ");
-		printf("HAS_RELOC");
-		flag_printed = 1;
-	}
-	if (ehdr->e_shnum > 0)/* numero de secciones en el archivo */
-	{
-		if (flag_printed)
-			printf(", ");
-		printf("HAS_SYMS");
-		flag_printed = 1;
-	}
-	if (ehdr->e_type == ET_DYN)
-	{
-		if (flag_printed)
-			printf(", ");
-		printf("DYNAMIC");
-		flag_printed = 1;
-	}
-	if (ehdr->e_phnum > 0) /* numero de programas en el headers*/
-	{
-		if (flag_printed)
-			printf(", ");
+	print_flag(&flag_printed, flags_interp, EXEC_P, "EXEC_P");
+	print_flag(&flag_printed, flags_interp, HAS_RELOC, "HAS_RELOC");
+	print_flag(&flag_printed, flags_interp, HAS_SYMS, "HAS_SYMS");
+	print_flag(&flag_printed, flags_interp, DYNAMIC, "DYNAMIC");
+	print_flag(&flag_printed, flags_interp, D_PAGED, "D_PAGED");
 
-		printf("D_PAGED");
-		flag_printed = 1;
-	}
 	printf("\n");
 	printf("start address 0x%016lx\n", (unsigned long)ehdr->e_entry);
 }
-
 
 
 int analyze_64bit_elf(Elf64_Ehdr *ehdr, const char *filename)

@@ -88,6 +88,9 @@ int analyze_64bit_elf(Elf64_Ehdr *ehdr, const char *filename);
 
 int analyze_32bit_elf(Elf32_Ehdr *ehdr);
 
+void print_flag(int *flag_printed, unsigned long flags, unsigned long flag,
+		const char *flag_name);
+
 
 
 #endif /* _HOBJDUMP_ */
