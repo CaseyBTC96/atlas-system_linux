@@ -7,62 +7,51 @@
 #include "hobjdump.h"
 
 
-void print_section_contents_32(Elf32_Shdr *shdr, char *map, int is_big_endian)
+void print_hex_ascii_block_32(const Elf32_Shdr *shdr,
+								const unsigned char *data, size_t offset,
+								size_t size, int is_big_endian)
 {
-	size_t section_size;
 	size_t i, j;
-	unsigned char *section_data;
 
-	section_data = (unsigned char *)(map + my_be32toh(shdr->sh_offset,
-					is_big_endian));
-	section_size = my_be32toh(shdr->sh_size, is_big_endian);
-
-	for (i = 0; i < section_size; i += 16)
+	for (i = 0; i < size; i += 16)
 	{
-		printf(" %04x", (int)(my_be32toh(shdr->sh_addr, is_big_endian) + i));
+		printf(" %04x", (int)(my_be32toh(shdr->sh_addr, is_big_endian) +
+		offset + i));
 		for (j = 0; j < 16; j++)
 		{
-			if (i + j < section_size)
-			{
-				if (j % 4 == 0)
-				{
-					printf(" ");/* espacio entre bloques */
-				}
-				printf("%02x", section_data[i + j]);
-			}
+			if (j % 4 == 0)
+				printf(" ");
+			if (i + j < size)
+				printf("%02x", data[offset + i + j]);
 			else
-			{
-				if (j % 4 == 0)
-				{
-					printf(" ");/* espacio entre bloques */
-				}
 				printf("  ");
-			}
 		}
 		printf("  ");
 		for (j = 0; j < 16; j++)
 		{
-			if (i + j < section_size)
+			if (i + j < size)
 			{
-				char c = section_data[i + j];
+				char c = data[offset + i + j];
 
-				if (c >= 32 && c <= 126)
-				{
-					printf("%c", c);
-				}
-				else
-				{
-					printf(".");
-				}
+				printf("%c", (c >= 32 && c <= 126) ? c : '.');
 			}
 			else
-			{
 				printf(" ");
-			}
 		}
 		printf("\n");
 	}
 }
+
+void print_section_contents_32(Elf32_Shdr *shdr, char *map, int is_big_endian)
+{
+	unsigned char *section_data = (unsigned char *)(map +
+	my_be32toh(shdr->sh_offset, is_big_endian));
+	size_t section_size = my_be32toh(shdr->sh_size, is_big_endian);
+
+	print_hex_ascii_block_32(shdr, section_data, 0, section_size,
+							 is_big_endian);
+}
+
 
 
 void print_sections_32(Elf32_Ehdr *ehdr, int is_big_endian, void *map)
