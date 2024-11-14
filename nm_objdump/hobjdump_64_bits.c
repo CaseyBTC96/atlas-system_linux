@@ -11,16 +11,22 @@ void print_hex_ascii_block(Elf64_Shdr *shdr, const unsigned char *data,
 							size_t offset, size_t size, int is_big_endian)
 {
 	size_t i, j;
+	int max_digits = 4;
+	char temp_buffer[16];
 
 	for (i = 0; i < size; i += 16)
 	{
-		if (my_be32toh(shdr->sh_addr, is_big_endian) == 0xf510)
-			printf(" %05x", (int)(my_be32toh(shdr->sh_addr,
-					is_big_endian) + offset + i));
-		else
-			printf(" %04x", (int)(my_be32toh(shdr->sh_addr,
-			is_big_endian) + offset + i));
+		int current_digits = 0;
+		unsigned long temp_addr = my_be32toh(shdr->sh_addr, is_big_endian) + i;
 
+		current_digits = sprintf(temp_buffer, "%lx", temp_addr);
+		if (current_digits > max_digits)
+			max_digits = currrent_digits;
+	}
+	for (i = 0; i <size; i += 16)
+	{
+		printf(" %0*x", max_digits, (int) (my_be32toh(shdr->sh_addr,
+						is_big_endian) + offset + i));
 		for (j = 0; j < 16; j++)
 		{
 			if (j % 4 == 0)
