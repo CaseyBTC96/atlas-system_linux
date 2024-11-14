@@ -7,38 +7,64 @@
 #include "hobjdump.h"
 
 
-
-
 void print_elf_header(Elf64_Ehdr *ehdr, const char *filename)
 {
 	const char *formatted_filename = filename;
+	int flag_printed = 0;
+	unsigned long flags_interp = 0;
 
 	if (formatted_filename[0] == '.' && formatted_filename[1] == '/')
 		formatted_filename += 2;
-
 	printf("%s:     file format elf64-x86-64\n", formatted_filename);
-
 	if (ehdr->e_machine == EM_X86_64)
-	{
 		printf("architecture: i386:x86-64");
-	}
-
-	printf(", flags 0x%08lx:\n", (unsigned long)ehdr->e_flags);
+	if (ehdr->e_type == ET_EXEC)
+		flags_interp |= EXEC_P;
+	if (ehdr->e_type == ET_REL)
+		flags_interp |= HAS_RELOC;
+	if (ehdr->e_type == ET_DYN)
+		flags_interp |= DYNAMIC;
+	if (ehdr->e_shnum > 0)
+		flags_interp |= HAS_SYMS;
+	if (ehdr->e_phnum > 0)
+		flags_interp |= D_PAGED;
+	printf(" flags 0x%08lx:\n", flags_interp);
 
 	if (ehdr->e_type == ET_EXEC)
 	{
-		printf("EXEC_P, ");
+		printf("EXEC_P");
+		flag_printed = 1;
 	}
-	if (ehdr->e_shnum > 0)
+	if (ehdr->e_type == ET_REL)
 	{
-		printf("HAS_SYMS, ");
+		if (flag_printed)
+			printf(", ");
+		printf("HAS_RELOC");
+		flag_printed = 1;
 	}
-	if (ehdr->e_flags & D_PAGED)
+	if (ehdr->e_shnum > 0)/* numero de secciones en el archivo */
 	{
-		printf("D_PAGED, ");
+		if (flag_printed)
+			printf(", ");
+		printf("HAS_SYMS");
+		flag_printed = 1;
+	}
+	if (ehdr->e_type == ET_DYN)
+	{
+		if (flag_printed)
+			printf(", ");
+		printf("DYNAMIC");
+		flag_printed = 1;
+	}
+	if (ehdr->e_phnum > 0) /* numero de programas en el headers*/
+	{
+		if (flag_printed)
+			printf(", ");
+
+		printf("D_PAGED");
+		flag_printed = 1;
 	}
 	printf("\n");
-
 	printf("start address 0x%016lx\n", (unsigned long)ehdr->e_entry);
 }
 
@@ -106,22 +132,6 @@ int analyze_file(const char *filename)
 	return (0);
 }
 
-int analyze_32bit_elf(Elf32_Ehdr *ehdr)
-{
-	if (ehdr->e_ident[EI_DATA] == ELFDATA2LSB)
-	{
-	}
-	else if (ehdr->e_ident[EI_DATA] == ELFDATA2MSB)
-	{
-		printf("big-endian32.\n");
-	}
-	else
-	{
-		printf("endianness unknown.\n");
-	}
-	return (0);
-}
-
 int main(int argc, char *argv[])
 {
 	int i;
@@ -144,7 +154,21 @@ int main(int argc, char *argv[])
 	return (0);
 }
 
-
+int analyze_32bit_elf(Elf32_Ehdr *ehdr)
+{
+	if (ehdr->e_ident[EI_DATA] == ELFDATA2LSB)
+	{
+	}
+	else if (ehdr->e_ident[EI_DATA] == ELFDATA2MSB)
+	{
+		printf("big-endian32.\n");
+	}
+	else
+	{
+		printf("endianness unknown.\n");
+	}
+	return (0);
+}
 
 
 	/* printf("e_ident[EI_MAG0]: 0x%02x\n", ehdr->e_ident[EI_MAG0]);

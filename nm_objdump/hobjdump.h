@@ -11,10 +11,11 @@
 #include <ctype.h>
 
 
-#define ELF_FLAGS_EXEC_P 0x00000002
 #define HAS_SYMS 0x10
 #define D_PAGED 0x100
 #define EXEC_P 0x02
+#define HAS_RELOC 0x01
+#define DYNAMIC 0x40
 
 /**
 * struct header32 - Represents a 32-bit ELF header.
