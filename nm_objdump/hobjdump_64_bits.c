@@ -13,7 +13,8 @@ void print_section_contents_64(Elf64_Shdr *shdr, char *map, int is_big_endian)
 	size_t i, j;
 	unsigned char *section_data;
 
-	section_data = (unsigned char *)(map + my_be32toh(shdr->sh_offset, is_big_endian));
+	section_data = (unsigned char *)(map + my_be32toh(shdr->sh_offset,
+	is_big_endian));
 	section_size = my_be32toh(shdr->sh_size, is_big_endian);
 
 	for (i = 0; i < section_size; i += 16)
@@ -73,20 +74,23 @@ void print_section_contents_64(Elf64_Shdr *shdr, char *map, int is_big_endian)
 	}
 }
 
-
 void print_sections_64(Elf64_Ehdr *ehdr, int is_big_endian, void *map)
 {
 	int i;
 	size_t section_size;
 	Elf64_Shdr *current_section;
 
-	Elf64_Shdr *shdr = (Elf64_Shdr *)((char *)map + my_be32toh(ehdr->e_shoff, is_big_endian));
-	char *string_table = (char *)map + my_be32toh(shdr[my_be16toh(ehdr->e_shstrndx, is_big_endian)].sh_offset, is_big_endian);
+	Elf64_Shdr *shdr = (Elf64_Shdr *)((char *)map +
+	my_be32toh(ehdr->e_shoff, is_big_endian));
+	char *string_table = (char *)map +
+	my_be32toh(shdr[my_be16toh(ehdr->e_shstrndx, is_big_endian)].sh_offset,
+	is_big_endian);
 
 	for (i = 1; i < my_be16toh(ehdr->e_shnum, is_big_endian); i++)
 	{
 
-		char *section_name = string_table + my_be32toh(shdr[i].sh_name, is_big_endian);
+		char *section_name = string_table + my_be32toh(shdr[i].sh_name,
+		is_big_endian);
 
 		/* Evita estas secciones */
 		if (strcmp(section_name, ".bss") == 0 ||
