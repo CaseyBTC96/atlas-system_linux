@@ -1,41 +1,33 @@
 #include <Python.h>
-#include <stdio.h>
-
 
 /**
-* print_python_string - Print information about a Python string object.
-*
-* This function prints information about a Python string object, including its
-* type, size, value, and address.
-*
-* @p: A pointer to the Python string object.
-*/
+ * name - description
+ * @var:
+ * @var:
+ * Return: int
+ */
 void print_python_string(PyObject *p)
 {
-	Py_ssize_t size;
-	wchar_t *wide_str;
+	char *type;
 
-	/* Disable output buffering to ensure immediate printing */
-	setbuf(stdout, NULL);
 	printf("[.] string object info\n");
-	/* Check if the object is a valid string */
+
 	if (!PyUnicode_Check(p))
 	{
-		puts("  [ERROR] Invalid String Object");
+		printf("  [ERROR] Invalid String Object\n");
 		return;
 	}
 
-	/* Get size of the string and the wide string pointer */
-	size = PyUnicode_GET_SIZE(p);
-	wide_str = PyUnicode_AsWideCharString(p, NULL);
+	if (PyUnicode_IS_COMPACT_ASCII(p))
+		type = "compact ascii";
+	else if (PyUnicode_IS_COMPACT(p))
+		type = "compact unicode object";
+	else if (PyUnicode_KIND(p) == PyUnicode_WCHAR_KIND)
+		type = "legacy string, not ready";
+	else if (!PyUnicode_IS_COMPACT(p))
+		type = "legacty string, ready";
 
-	/* Print type, size, value, and address of the string */
-
-	printf("  type: %s\n", PyUnicode_IS_COMPACT_ASCII(p) ?
-			"compact ascii" : "compact unicode object");
-	printf("  length: %li\n", size);
-	printf("  value: %ls\n", wide_str);
-
-	/* Release the wide string memory */
-	PyMem_Free(wide_str);
+	printf("  type: %s\n", type);
+	printf("  length: %ld\n", (((PyASCIIObject *)(p))->length));
+	printf("  value: %ls\n", (PyUnicode_AsWideCharString(p, NULL)));
 }
