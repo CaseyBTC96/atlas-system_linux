@@ -1,51 +1,10 @@
 #ifndef _SYSCALLS_H_
-#define _SYSCALLS_H_
+# define _SYSCALLS_H_
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/ptrace.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <sys/user.h>
-#include <errno.h>
-#include <sys/syscall.h>
-#include <unistd.h>
+# include <stddef.h>
 
-// #define NAMES (syscalls_64_g[syscall_num].name)
-#define NAMES (syscalls_64_g[regs.orig_rax].name)
-#define PARAMETERS (syscalls_64_g[regs.orig_rax].nb_params)
-#define TYPES (syscalls_64_g[regs.orig_rax].params[i])
-// #define NAMES "SomeSyscallName"
-#define MAX_PARAMS 6
-
-// /* Function prototypes */
-// static inline void handle_ptrace_error(const char *msg);
-// static inline void print_syscall_number(struct user_regs_struct *regs, int syscall_count);
-// void print_error(const char *syscall_name, long ret_value);
-
-// Function prototypes for printing registers
-void print_rdi(struct user_regs_struct *regs);
-void print_rsi(struct user_regs_struct *regs);
-void print_rdx(struct user_regs_struct *regs);
-void print_r10(struct user_regs_struct *regs);
-void print_r8(struct user_regs_struct *regs);
-void print_r9(struct user_regs_struct *regs);
-
-// Array of function pointers to print specific registers
-void (*print_param_functions[MAX_PARAMS])(struct user_regs_struct *) = {
-    print_rdi,
-    print_rsi,
-    print_rdx,
-    print_r10,
-    print_r8,
-    print_r9
-};
-
-/* Function prototypes */
-static inline int get_regs(pid_t child, struct user_regs_struct *regs);
-static inline int should_print(int check);
+/* Normally, MAX_PARAMS is always 6 */
+# define MAX_PARAMS	6
 
 /**
  * enum type_e - Enumerates the different types present in the different
@@ -571,7 +530,28 @@ static syscall_t const syscalls_64_g[] = {
 	{"sched_setattr", 314, -1, 0, {-1, -1, -1, -1, -1, -1}},
 	{"sched_getattr", 315, -1, 0, {-1, -1, -1, -1, -1, -1}},
 	{"renameat2", 316, -1, 0, {-1, -1, -1, -1, -1, -1}},
-	{"seccomp", 317, -1, 0, {-1, -1, -1, -1, -1, -1}}
+	{"seccomp", 317, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"getRandom", 318, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 319, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 320, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 321, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 322, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 323, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 324, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 325, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 326, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 327, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 328, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 329, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 330, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 331, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 332, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 333, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"rseq", 334, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 335, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 336, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 337, -1, 0, {-1, -1, -1, -1, -1, -1}},
+	{"?", 338, -1, 0, {-1, -1, -1, -1, -1, -1}},
 };
 
 static syscall_t const syscalls_32_g[] = {
@@ -1002,6 +982,4 @@ static syscall_t const syscalls_32_g[] = {
 	{"seccomp", 354, -1, 0, {-1, -1, -1, -1, -1, -1}}
 };
 
-
-
-#endif /* _SYSCALLS_H_ */
+#endif /* !_SYSCALLS_H_ */
