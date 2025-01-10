@@ -1,176 +1,21 @@
 #ifndef _SYSCALLS_H_
-#define _SYSCALLS_H_
+# define _SYSCALLS_H_
 
-#include <sys/ptrace.h>
-#include <sys/types.h>
-#include <sys/user.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <sys/mman.h>
 #include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
+#include <sys/ptrace.h>
 #include <stdio.h>
-
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <sys/user.h>
+#include <string.h>
 
 /* Normally, MAX_PARAMS is always 6 */
-#define MAX_PARAMS	6
-
-#define IS_UINT(x) (x == UINT32_T || x == UNSIGNED_INT || x == GID_T ||\
-	x == ID_T || x == MODE_T || x == SIZE_T || x == SOCKLEN_T || x == U64 ||\
-	x == UID_T || x == UNSIGNED_LONG)
-#define IS_LONG(x) (x == LONG || x == PID_T || x == SSIZE_T || x == CLOCK_T ||\
-	x == TIME_T)
-
-#define IS_INT(x) (x == CLOCKID_T || x == KEY_T || x == MQD_T ||\
-	x == IDTYPE_T || x == INT || x == KEY_SERIAL_T ||\
-	x == ENUM___PTRACE_REQUEST || x == PID_T)
-
-#define IS_POINTER(x) (x == AIO_CONTEXT_T_P || x == CHAR_P ||\
-	x == CPU_SET_T_P || x == FD_SET_P || x == GID_T_P || x == INT_P ||\
-	x == LOFF_T_P || x == LONG_P || x == OFF_T_P || x == SIGINFO_T_P ||\
-	x == SIGSET_T_P || x == SIZE_T_P || x == SOCKLEN_T_P || x == STACK_T_P ||\
-	x == STRUCT_EPOLL_EVENT_P || x == STRUCT_GETCPU_CACHE_P ||\
-	x == STRUCT_IOCB_P || x == STRUCT_IOVEC_P || x == STRUCT_IO_EVENT_P ||\
-	x == STRUCT_ITIMERSPEC_P || x == STRUCT_ITIMERVAL_P ||\
-	x == STRUCT_KERNEL_SYM_P || x == STRUCT_KEXEC_SEGMENT_P ||\
-	x == STRUCT_LINUX_DIRENT_P || x == STRUCT_MMSGHDR_P ||\
-	x == STRUCT_MQ_ATTR_P || x == STRUCT_MSGHDR_P || x == STRUCT_MSQID_DS_P ||\
-	x == STRUCT_NFSCTL_ARG_P || x == STRUCT_OLD_LINUX_DIRENT_P ||\
-	x == STRUCT_PERF_EVENT_ATTR_P || x == STRUCT_POLLFD_P ||\
-	x == STRUCT_RLIMIT_P || x == STRUCT_ROBUST_LIST_HEAD_P ||\
-	x == STRUCT_RUSAGE_P || x == STRUCT_SCHED_PARAM_P ||\
-	x == STRUCT_SEMBUF_P || x == STRUCT_SHMID_DS_P ||\
-	x == STRUCT_SIGACTION_P || x == STRUCT_SIGEVENT_P ||\
-	x == STRUCT_SOCKADDR_P || x == STRUCT_STATFS_P || x == STRUCT_STAT_P ||\
-	x == STRUCT_SYSINFO_P || x == STRUCT_TIMESPEC_P || x == STRUCT_TIMEVAL_P ||\
-	x == STRUCT_TIMEX_P || x == STRUCT_TIMEZONE_P || x == STRUCT_TMS_P ||\
-	x == STRUCT_USER_DESC_P || x == STRUCT_USTAT_P || x == STRUCT_UTIMBUF_P ||\
-	x == STRUCT_UTSNAME_P || x == STRUCT_VM86_STRUCT_P ||\
-	x == STRUCT___SYSCTL_ARGS_P || x == TIMER_T_P || x == TIME_T_P ||\
-	x == UID_T_P || x == UNION_NFSCTL_RES_P || x == UNSIGNED_CHAR_P ||\
-	x == UNSIGNED_LONG_P || x == UNSIGNED_P || x == VOID_P)
-
-/**
- * struct flag_s - struct that associates a flag macro with its name and value
- * @name: name of flag as a string
- * @value: value of flag
- **/
-typedef struct flag_s
-{
-	const char *name;
-	int value;
-} flag_t;
+# define MAX_PARAMS	6
 
 /**
  * enum type_e - Enumerates the different types present in the different
- *               syscall parameters and return types
- * @AIO_CONTEXT_T: AIO_CONTEXT_T
- * @AIO_CONTEXT_T_P: AIO_CONTEXT_T_P
- * @CADDR_T: CADDR_T
- * @CAP_USER_DATA_T: CAP_USER_DATA_T
- * @CAP_USER_HEADER_T: CAP_USER_HEADER_T
- * @CHAR_P: CHAR_P
- * @CLOCKID_T: CLOCKID_T
- * @CLOCK_T: CLOCK_T
- * @CPU_SET_T_P: CPU_SET_T_P
- * @DEV_T: DEV_T
- * @ENUM___PTRACE_REQUEST: ENUM___PTRACE_REQUEST
- * @FD_SET_P: FD_SET_P
- * @GID_T: GID_T
- * @GID_T_P: GID_T_P
- * @IDTYPE_T: IDTYPE_T
- * @ID_T: ID_T
- * @INT: INT
- * @INT_P: INT_P
- * @KEY_SERIAL_T: KEY_SERIAL_T
- * @KEY_T: KEY_T
- * @LOFF_T_P: LOFF_T_P
- * @LONG: LONG
- * @LONG_P: LONG_P
- * @MODE_T: MODE_T
- * @MQD_T: MQD_T
- * @NFDS_T: NFDS_T
- * @OFF64_T: OFF64_T
- * @OFF_T: OFF_T
- * @OFF_T_P: OFF_T_P
- * @PID_T: PID_T
- * @SIGHANDLER_T: SIGHANDLER_T
- * @SIGINFO_T_P: SIGINFO_T_P
- * @SIGSET_T_P: SIGSET_T_P
- * @SIZE_T: SIZE_T
- * @SIZE_T_P: SIZE_T_P
- * @SOCKLEN_T: SOCKLEN_T
- * @SOCKLEN_T_P: SOCKLEN_T_P
- * @SSIZE_T: SSIZE_T
- * @STACK_T_P: STACK_T_P
- * @STRUCT_EPOLL_EVENT_P: STRUCT_EPOLL_EVENT_P
- * @STRUCT_GETCPU_CACHE_P: STRUCT_GETCPU_CACHE_P
- * @STRUCT_IOCB_P: STRUCT_IOCB_P
- * @STRUCT_IOCB_PP: STRUCT_IOCB_PP
- * @STRUCT_IOVEC_P: STRUCT_IOVEC_P
- * @STRUCT_IO_EVENT_P: STRUCT_IO_EVENT_P
- * @STRUCT_ITIMERSPEC_P: STRUCT_ITIMERSPEC_P
- * @STRUCT_ITIMERVAL_P: STRUCT_ITIMERVAL_P
- * @STRUCT_KERNEL_SYM_P: STRUCT_KERNEL_SYM_P
- * @STRUCT_KEXEC_SEGMENT_P: STRUCT_KEXEC_SEGMENT_P
- * @STRUCT_LINUX_DIRENT_P: STRUCT_LINUX_DIRENT_P
- * @STRUCT_MMSGHDR_P: STRUCT_MMSGHDR_P
- * @STRUCT_MQ_ATTR_P: STRUCT_MQ_ATTR_P
- * @STRUCT_MSGHDR_P: STRUCT_MSGHDR_P
- * @STRUCT_MSQID_DS_P: STRUCT_MSQID_DS_P
- * @STRUCT_NFSCTL_ARG_P: STRUCT_NFSCTL_ARG_P
- * @STRUCT_OLD_LINUX_DIRENT_P: STRUCT_OLD_LINUX_DIRENT_P
- * @STRUCT_PERF_EVENT_ATTR_P: STRUCT_PERF_EVENT_ATTR_P
- * @STRUCT_POLLFD_P: STRUCT_POLLFD_P
- * @STRUCT_RLIMIT_P: STRUCT_RLIMIT_P
- * @STRUCT_ROBUST_LIST_HEAD_P: STRUCT_ROBUST_LIST_HEAD_P
- * @STRUCT_ROBUST_LIST_HEAD_PP: STRUCT_ROBUST_LIST_HEAD_PP
- * @STRUCT_RUSAGE_P: STRUCT_RUSAGE_P
- * @STRUCT_SCHED_PARAM_P: STRUCT_SCHED_PARAM_P
- * @STRUCT_SEMBUF_P: STRUCT_SEMBUF_P
- * @STRUCT_SHMID_DS_P: STRUCT_SHMID_DS_P
- * @STRUCT_SIGACTION_P: STRUCT_SIGACTION_P
- * @STRUCT_SIGEVENT_P: STRUCT_SIGEVENT_P
- * @STRUCT_SOCKADDR_P: STRUCT_SOCKADDR_P
- * @STRUCT_STATFS_P: STRUCT_STATFS_P
- * @STRUCT_STAT_P: STRUCT_STAT_P
- * @STRUCT_SYSINFO_P: STRUCT_SYSINFO_P
- * @STRUCT_TIMESPEC: STRUCT_TIMESPEC
- * @STRUCT_TIMESPEC_P: STRUCT_TIMESPEC_P
- * @STRUCT_TIMEVAL: STRUCT_TIMEVAL
- * @STRUCT_TIMEVAL_P: STRUCT_TIMEVAL_P
- * @STRUCT_TIMEX_P: STRUCT_TIMEX_P
- * @STRUCT_TIMEZONE_P: STRUCT_TIMEZONE_P
- * @STRUCT_TMS_P: STRUCT_TMS_P
- * @STRUCT_USER_DESC_P: STRUCT_USER_DESC_P
- * @STRUCT_USTAT_P: STRUCT_USTAT_P
- * @STRUCT_UTIMBUF_P: STRUCT_UTIMBUF_P
- * @STRUCT_UTSNAME_P: STRUCT_UTSNAME_P
- * @STRUCT_VM86_STRUCT_P: STRUCT_VM86_STRUCT_P
- * @STRUCT___SYSCTL_ARGS_P: STRUCT___SYSCTL_ARGS_P
- * @TIMER_T: TIMER_T
- * @TIMER_T_P: TIMER_T_P
- * @TIME_T: TIME_T
- * @TIME_T_P: TIME_T_P
- * @U64: U64
- * @UID_T: UID_T
- * @UID_T_P: UID_T_P
- * @UINT32_T: UINT32_T
- * @UNION_NFSCTL_RES_P: UNION_NFSCTL_RES_P
- * @UNSIGNED: UNSIGNED
- * @UNSIGNED_CHAR_P: UNSIGNED_CHAR_P
- * @UNSIGNED_INT: UNSIGNED_INT
- * @UNSIGNED_LONG: UNSIGNED_LONG
- * @UNSIGNED_LONG_P: UNSIGNED_LONG_P
- * @UNSIGNED_P: UNSIGNED_P
- * @VARARGS: VARARGS
- * @VOID: VOID
- * @VOID_P: VOID_P
- * @VOID_PP: VOID_PP
+ * syscall parameters and return types
  */
 typedef enum type_e
 {
@@ -267,12 +112,17 @@ typedef enum type_e
 	UID_T_P,
 	UINT32_T,
 	UNION_NFSCTL_RES_P,
-	UNSIGNED,
 	UNSIGNED_CHAR_P,
+	UNSIGNED_FLAGS,
 	UNSIGNED_INT,
 	UNSIGNED_LONG,
 	UNSIGNED_LONG_P,
-	UNSIGNED_P,
+	UNSIGNED_MSG_PRIO,
+	UNSIGNED_NR_EVENTS,
+	UNSIGNED_NSOPS,
+	UNSIGNED_PCPU,
+	UNSIGNED_PMSG_PRIO,
+	UNSIGNED_PNODE,
 	VARARGS,
 	VOID,
 	VOID_P,
@@ -296,20 +146,6 @@ typedef struct syscall_s
 	size_t const nb_params;
 	type_t const params[MAX_PARAMS];
 } syscall_t;
-
-
-void print_arg(type_t type, unsigned long int param);
-int print_execve_line(int argc, char *argv[], char *envp[], pid_t pid);
-void print_args(const syscall_t *sc, struct user_regs_struct *regs, pid_t pid);
-void print_mmap_flags(int flags);
-void print_mmap_prot_flags(int prot);
-void print_open_flags(int open_flags);
-void print_access_flags(int access_flags);
-void print_read_write_buffer(pid_t pid, unsigned long addr, size_t buf_size);
-void print_stat_struct(pid_t pid, unsigned long addr);
-void print_mode(mode_t mode);
-
-
 
 static syscall_t const syscalls_64_g[] = {
 	{"read", 0, SSIZE_T, 3, {INT, VOID_P, SIZE_T, -1, -1, -1}},
@@ -388,7 +224,7 @@ static syscall_t const syscalls_64_g[] = {
 	{"kill", 62, INT, 2, {PID_T, INT, -1, -1, -1, -1}},
 	{"uname", 63, INT, 1, {STRUCT_UTSNAME_P, -1, -1, -1, -1, -1}},
 	{"semget", 64, INT, 3, {KEY_T, INT, INT, -1, -1, -1}},
-	{"semop", 65, INT, 3, {INT, STRUCT_SEMBUF_P, UNSIGNED, -1, -1,
+	{"semop", 65, INT, 3, {INT, STRUCT_SEMBUF_P, UNSIGNED_NSOPS, -1, -1,
 		-1}},
 	{"semctl", 66, INT, 4, {INT, INT, INT, VARARGS, -1, -1}},
 	{"shmdt", 67, INT, 1, {VOID_P, -1, -1, -1, -1, -1}},
@@ -552,7 +388,7 @@ static syscall_t const syscalls_64_g[] = {
 		-1, -1}},
 	{"set_thread_area", 205, INT, 1, {STRUCT_USER_DESC_P, -1, -1, -1, -1,
 		-1}},
-	{"io_setup", 206, INT, 2, {UNSIGNED, AIO_CONTEXT_T_P, -1,
+	{"io_setup", 206, INT, 2, {UNSIGNED_NR_EVENTS, AIO_CONTEXT_T_P, -1,
 		-1, -1, -1}},
 	{"io_destroy", 207, INT, 1, {AIO_CONTEXT_T, -1, -1, -1, -1, -1}},
 	{"io_getevents", 208, INT, 5, {AIO_CONTEXT_T, LONG, LONG,
@@ -573,7 +409,7 @@ static syscall_t const syscalls_64_g[] = {
 		UNSIGNED_INT, -1, -1, -1}},
 	{"set_tid_address", 218, LONG, 1, {INT_P, -1, -1, -1, -1, -1}},
 	{"restart_syscall", 219, INT, 1, {VOID, -1, -1, -1, -1, -1}},
-	{"semtimedop", 220, INT, 4, {INT, STRUCT_SEMBUF_P, UNSIGNED,
+	{"semtimedop", 220, INT, 4, {INT, STRUCT_SEMBUF_P, UNSIGNED_NSOPS,
 		STRUCT_TIMESPEC_P, -1, -1}},
 	{"fadvise64", 221, INT, 4, {INT, OFF_T, OFF_T, INT, -1, -1}},
 	{"timer_create", 222, INT, 3, {CLOCKID_T, STRUCT_SIGEVENT_P,
@@ -601,16 +437,16 @@ static syscall_t const syscalls_64_g[] = {
 	{"utimes", 235, INT, 2, {CHAR_P, STRUCT_TIMEVAL, -1, -1, -1, -1}},
 	{"vserver", 236, -1, 0, {-1, -1, -1, -1, -1, -1}},
 	{"mbind", 237, INT, 6, {VOID_P, UNSIGNED_LONG, INT, UNSIGNED_LONG_P,
-		UNSIGNED_LONG, UNSIGNED}},
+		UNSIGNED_LONG, UNSIGNED_FLAGS}},
 	{"set_mempolicy", 238, -1, 0, {-1, -1, -1, -1, -1, -1}},
 	{"get_mempolicy", 239, INT, 5, {INT_P, UNSIGNED_LONG_P, UNSIGNED_LONG,
 		UNSIGNED_LONG, UNSIGNED_LONG, -1}},
 	{"mq_open", 240, MQD_T, 2, {CHAR_P, INT, -1, -1, -1, -1}},
 	{"mq_unlink", 241, INT, 1, {CHAR_P, -1, -1, -1, -1, -1}},
 	{"mq_timedsend", 242, INT, 5, {MQD_T, CHAR_P, SIZE_T,
-		UNSIGNED, STRUCT_TIMESPEC_P, -1}},
+		UNSIGNED_MSG_PRIO, STRUCT_TIMESPEC_P, -1}},
 	{"mq_timedreceive", 243, SSIZE_T, 5, {MQD_T, CHAR_P, SIZE_T,
-		UNSIGNED_P, STRUCT_TIMESPEC_P, -1}},
+		UNSIGNED_PMSG_PRIO, STRUCT_TIMESPEC_P, -1}},
 	{"mq_notify", 244, INT, 2, {MQD_T, STRUCT_SIGEVENT_P, -1, -1, -1, -1}},
 	{"mq_getsetattr", 245, INT, 3, {MQD_T, STRUCT_MQ_ATTR_P,
 		STRUCT_MQ_ATTR_P, -1, -1, -1}},
@@ -696,7 +532,7 @@ static syscall_t const syscalls_64_g[] = {
 	{"sendmmsg", 307, INT, 4, {INT, STRUCT_MMSGHDR_P, UNSIGNED_INT,
 		UNSIGNED_INT, -1, -1}},
 	{"setns", 308, INT, 2, {INT, INT, -1, -1, -1, -1}},
-	{"getcpu", 309, INT, 3, {UNSIGNED_P, UNSIGNED_P,
+	{"getcpu", 309, INT, 3, {UNSIGNED_PCPU, UNSIGNED_PNODE,
 		STRUCT_GETCPU_CACHE_P, -1, -1, -1}},
 	{"process_vm_readv", 310, SSIZE_T, 6, {PID_T, STRUCT_IOVEC_P,
 		UNSIGNED_LONG, STRUCT_IOVEC_P, UNSIGNED_LONG, UNSIGNED_LONG}},
@@ -987,7 +823,8 @@ static syscall_t const syscalls_32_g[] = {
 		-1}},
 	{"get_thread_area", 244, INT, 1, {STRUCT_USER_DESC_P, -1, -1, -1, -1,
 		-1}},
-	{"io_setup", 245, INT, 2, {UNSIGNED, AIO_CONTEXT_T_P, -1, -1, -1, -1}},
+	{"io_setup", 245, INT, 2, {UNSIGNED_NR_EVENTS, AIO_CONTEXT_T_P, -1, -1,
+		-1, -1}},
 	{"io_destroy", 246, INT, 1, {AIO_CONTEXT_T, -1, -1, -1, -1, -1}},
 	{"io_getevents", 247, INT, 5, {AIO_CONTEXT_T, LONG, LONG,
 		STRUCT_IO_EVENT_P, STRUCT_TIMESPEC_P, -1}},
@@ -1029,16 +866,16 @@ static syscall_t const syscalls_32_g[] = {
 	{"fadvise64_64", 272, -1, 0, {-1, -1, -1, -1, -1, -1}},
 	{"vserver", 273, -1, 0, {-1, -1, -1, -1, -1, -1}},
 	{"mbind", 274, INT, 6, {VOID_P, UNSIGNED_LONG, INT, UNSIGNED_LONG_P,
-		UNSIGNED_LONG, UNSIGNED}},
+		UNSIGNED_LONG, UNSIGNED_FLAGS}},
 	{"get_mempolicy", 275, INT, 5, {INT_P, UNSIGNED_LONG_P, UNSIGNED_LONG,
 		UNSIGNED_LONG, UNSIGNED_LONG, -1}},
 	{"set_mempolicy", 276, -1, 0, {-1, -1, -1, -1, -1, -1}},
 	{"mq_open", 277, MQD_T, 2, {CHAR_P, INT, -1, -1, -1, -1}},
 	{"mq_unlink", 278, INT, 1, {CHAR_P, -1, -1, -1, -1, -1}},
 	{"mq_timedsend", 279, INT, 5, {MQD_T, CHAR_P, SIZE_T,
-		UNSIGNED, STRUCT_TIMESPEC_P, -1}},
+		UNSIGNED_MSG_PRIO, STRUCT_TIMESPEC_P, -1}},
 	{"mq_timedreceive", 280, SSIZE_T, 5, {MQD_T, CHAR_P, SIZE_T,
-		UNSIGNED_P, STRUCT_TIMESPEC_P, -1}},
+		UNSIGNED_PMSG_PRIO, STRUCT_TIMESPEC_P, -1}},
 	{"mq_notify", 281, INT, 2, {MQD_T, STRUCT_SIGEVENT_P, -1, -1, -1, -1}},
 	{"mq_getsetattr", 282, INT, 3, {MQD_T, STRUCT_MQ_ATTR_P,
 		STRUCT_MQ_ATTR_P, -1, -1, -1}},
@@ -1087,7 +924,7 @@ static syscall_t const syscalls_32_g[] = {
 		UNSIGNED_INT, -1, -1}},
 	{"move_pages", 317, LONG, 6, {INT, UNSIGNED_LONG, VOID_PP, INT_P,
 		INT_P, INT}},
-	{"getcpu", 318, INT, 3, {UNSIGNED_P, UNSIGNED_P,
+	{"getcpu", 318, INT, 3, {UNSIGNED_PCPU, UNSIGNED_PNODE,
 		STRUCT_GETCPU_CACHE_P, -1, -1, -1}},
 	{"epoll_pwait", 319, INT, 5, {INT, STRUCT_EPOLL_EVENT_P, INT, INT,
 		SIGSET_T_P, -1}},
