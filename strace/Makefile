@@ -1,26 +1,34 @@
+# Define the compiler and flags
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -pedantic -g
 
+# Define the source files and targets
 SRC = $(wildcard *.c)
-0 = $(patsubst %.c, %.o, $(wildcard 0-*.c))
-1 = $(patsubst %.c, %.o, $(wildcard 1-*.c))
-2 = $(patsubst %.c, %.o, $(wildcard 2-*.c))
-3 = $(patsubst %.c, %.o, $(wildcard 3-*.c))
+TARGETS = strace_0 strace_1 strace_2 strace_3
 
-.PHONY: strace_0 strace_1 strace_2 strace_3 clean
+# Pattern for object files
+OBJ = $(SRC:.c=.o)
 
-strace_0: $(0)
-	$(CC) $(CFLAGS) $(0) -o strace_0
+# Default rule to build all targets
+all: $(TARGETS)
 
-strace_1: $(1)
-	$(CC) $(CFLAGS) $(1) -o strace_1
+# Rule to build each target
+$(TARGETS): %: %.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-strace_2: $(2)
-	$(CC) $(CFLAGS) $(2) -o strace_2
+# Rule to build object files
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-strace_3: $(3)
-	$(CC) $(CFLAGS) $(3) -o strace_3
-
+# Rule to clean the build
 clean:
-	rm -f *-strace
-	rm -f *.o
+	rm -f $(TARGETS) *.o
+
+# Rule to check for memory leaks using Valgrind
+valgrind: $(TARGETS)
+	valgrind ./strace_0 /bin/echo hello
+	valgrind ./strace_1 /bin/echo hello
+	valgrind ./strace_2 /bin/echo hello
+	valgrind ./strace_3 /bin/echo hello
+
+.PHONY: all clean valgrind
