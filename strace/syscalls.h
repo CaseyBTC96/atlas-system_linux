@@ -1,19 +1,7 @@
 #ifndef _SYSCALLS_H_
-#define _SYSCALLS_H_
+# define _SYSCALLS_H_
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/ptrace.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <sys/user.h>
-#include <sys/reg.h>
-
-#define SYSNAME syscalls_64_g[regs.orig_rax].name
-#define SYSPARAM syscalls_64_g[regs.orig_rax].nb_params
-#define SYSTYPE syscalls_64_g[regs.orig_rax].params[i]
+# include <stddef.h>
 
 /* Normally, MAX_PARAMS is always 6 */
 # define MAX_PARAMS	6
