@@ -1,2 +1,6 @@
 testing/
 *.out
+strace_0
+strace_1
+strace_2
+strace_3
