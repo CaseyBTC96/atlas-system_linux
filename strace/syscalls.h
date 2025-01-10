@@ -1,10 +1,51 @@
 #ifndef _SYSCALLS_H_
-# define _SYSCALLS_H_
+#define _SYSCALLS_H_
 
-# include <stddef.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/ptrace.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <sys/user.h>
+#include <errno.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
-/* Normally, MAX_PARAMS is always 6 */
-# define MAX_PARAMS	6
+// #define NAMES (syscalls_64_g[syscall_num].name)
+#define NAMES (syscalls_64_g[regs.orig_rax].name)
+#define PARAMETERS (syscalls_64_g[regs.orig_rax].nb_params)
+#define TYPES (syscalls_64_g[regs.orig_rax].params[i])
+// #define NAMES "SomeSyscallName"
+#define MAX_PARAMS 6
+
+// /* Function prototypes */
+// static inline void handle_ptrace_error(const char *msg);
+// static inline void print_syscall_number(struct user_regs_struct *regs, int syscall_count);
+// void print_error(const char *syscall_name, long ret_value);
+
+// Function prototypes for printing registers
+void print_rdi(struct user_regs_struct *regs);
+void print_rsi(struct user_regs_struct *regs);
+void print_rdx(struct user_regs_struct *regs);
+void print_r10(struct user_regs_struct *regs);
+void print_r8(struct user_regs_struct *regs);
+void print_r9(struct user_regs_struct *regs);
+
+// Array of function pointers to print specific registers
+void (*print_param_functions[MAX_PARAMS])(struct user_regs_struct *) = {
+    print_rdi,
+    print_rsi,
+    print_rdx,
+    print_r10,
+    print_r8,
+    print_r9
+};
+
+/* Function prototypes */
+static inline int get_regs(pid_t child, struct user_regs_struct *regs);
+static inline int should_print(int check);
 
 /**
  * enum type_e - Enumerates the different types present in the different
@@ -961,4 +1002,6 @@ static syscall_t const syscalls_32_g[] = {
 	{"seccomp", 354, -1, 0, {-1, -1, -1, -1, -1, -1}}
 };
 
-#endif /* !_SYSCALLS_H_ */
+
+
+#endif /* _SYSCALLS_H_ */
