@@ -1,5 +1,6 @@
 testing/
 *.out
+*.swp
 strace_0
 strace_1
 strace_2
