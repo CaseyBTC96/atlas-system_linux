@@ -100,14 +100,14 @@ int parent_process(pid_t child)
 	return (0);
 }
 
-void print_params(struct user_regs_struct *regs, syscall_t const callinfo)
+void print_params(struct user_regs_struct *regs, syscall_t const *callinfo)
 {
-	int i;
+	size_t i;
 
 	printf("(");
 	for (i = 0; i <= callinfo->nb_params; i++)
 	{
-		if (callinfo->nb_params = 0)
+		if (callinfo->nb_params == 0)
 			printf("0");
 
 		switch(i)
