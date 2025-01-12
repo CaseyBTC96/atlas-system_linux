@@ -63,30 +63,24 @@ int child_process(char *path, char **child_args)
 int parent_process(pid_t child)
 {
 	int status, entry = 0;
+	struct user_regs_struct regs;
 
 	while (1)
 	{
-		if (waitpid(child, &status, 0) == -1)
-			return (1);
 
-		if (WIFEXITED(status) || WIFSIGNALED(status))
+		if(waitpid(child, &status, 0) == -1)
+			perror("waitPID");
+
+		if (WIFEXITED(status))
 			break;
 
-		if (WIFSTOPPED(status))
+		ptrace(PTRACE_GETREGS, child, NULL, &regs);
+
+		if (entry == 0 || entry % 2 != 0)
 		{
-			struct user_regs_struct regs;
-
-			if (ptrace(PTRACE_GETREGS, child, NULL, &regs) == -1)
-				perror("ptrace_regs"), exit(1);
-
-			if (entry == 0)
-			{
-				printf("%llu\n", regs.orig_rax);
-				entry = 1;
-			}
-			else
-				entry = 0;
+			printf("%llu\n", regs.orig_rax);
 		}
+		entry++;
 
 		if (ptrace(PTRACE_SYSCALL, child, NULL, NULL) == -1)
 			return (1);
