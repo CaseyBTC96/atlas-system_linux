@@ -21,7 +21,8 @@ int main(int argc, char **argv, char **env)
 	child = fork();
 	if (child == 0)
 	{
-		child_process(argv[1], &argv[1], &env[0]);
+		ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+		execve(argv[1], &argv[1], env);
 	}
 	else
 	{
@@ -29,28 +30,6 @@ int main(int argc, char **argv, char **env)
 	}
 	return (0);
 }
-
-/**
- * child_process - handles the child process
- * @path: the PATH
- * @child_args: the argument vector
- *
- * Return: 0 or 1
- */
-
-int child_process(char *path, char **child_args, char **env)
-{
-	if (ptrace(PTRACE_TRACEME, 0, NULL, NULL) == -1)
-	{
-		perror("ptrace child");
-	}
-	if (execve(path, child_args, env) == -1)
-	{
-		perror("execve");
-	}
-	return (1);
-}
-
 /**
  * parent_process - handles the parent process
  * @child: the child PID
