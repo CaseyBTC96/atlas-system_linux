@@ -8,7 +8,7 @@
  * Return: 0 or 1
  */
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **env)
 {
 	if (argc < 2)
 	{
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	child = fork();
 	if (child == 0)
 	{
-		child_process(argv[1], &argv[1]);
+		child_process(argv[1], &argv[1], &env[0]);
 	}
 	else
 	{
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
  * Return: 0 or 1
  */
 
-int child_process(char *path, char **child_args)
+int child_process(char *path, char **child_args, char **env)
 {
 	char *env[] = {NULL};
 
