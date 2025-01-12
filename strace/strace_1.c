@@ -8,7 +8,8 @@
  * Return: 0 or 1
  */
 
-int main(int argc, char **argv)
+
+int main(int argc, char **argv, char **env)
 {
 	if (argc < 2)
 	{
@@ -21,36 +22,14 @@ int main(int argc, char **argv)
 	child = fork();
 	if (child == 0)
 	{
-		child_process(argv[1], &argv[1]);
+		ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+		execve(argv[1], &argv[1], env);
 	}
 	else
 	{
 		parent_process(child);
 	}
 	return (0);
-}
-
-/**
- * child_process - handles the child process
- * @path: the PATH
- * @child_args: the argument vector
- *
- * Return: 0 or 1
- */
-
-int child_process(char *path, char **child_args)
-{
-	char *env[] = {NULL};
-
-	if (ptrace(PTRACE_TRACEME, 0, NULL, NULL) == -1)
-	{
-		perror("ptrace child");
-	}
-	if (execve(path, child_args, env) == -1)
-	{
-		perror("execve");
-	}
-	return (1);
 }
 
 /**
@@ -62,7 +41,8 @@ int child_process(char *path, char **child_args)
 
 int parent_process(pid_t child)
 {
-	int status, entry;
+	int status, entry = 0;
+	struct user_regs_struct regs;
 
 	while (1)
 	{
@@ -74,24 +54,22 @@ int parent_process(pid_t child)
 
 		if (WIFSTOPPED(status))
 		{
-			struct user_regs_struct regs;
 			syscall_t const *callinfo;
 
 			if (ptrace(PTRACE_GETREGS, child, NULL, &regs) == -1)
 				perror("ptrace_regs"), exit(1);
 
-			if (entry == 0)
+			if (entry == 0 || entry % 2 != 0)
 			{
 				callinfo = &syscalls_64_g[regs.orig_rax];
 				printf("%s\n", callinfo->name);
-				entry = 1;
 			}
-			else
-				entry = 0;
+			entry++;
 		}
 
 		if (ptrace(PTRACE_SYSCALL, child, NULL, NULL) == -1)
 			return (1);
+		fflush(NULL);
 	}
 	return (0);
 }

@@ -30,6 +30,8 @@ int main(int argc, char **argv, char **env)
 	}
 	return (0);
 }
+
+
 /**
  * parent_process - handles the parent process
  * @child: the child PID
@@ -44,7 +46,6 @@ int parent_process(pid_t child)
 
 	while (1)
 	{
-
 		if(waitpid(child, &status, 0) == -1)
 			perror("waitPID");
 
@@ -61,6 +62,7 @@ int parent_process(pid_t child)
 
 		if (ptrace(PTRACE_SYSCALL, child, NULL, NULL) == -1)
 			return (1);
+		fflush(NULL);
 	}
 	return (0);
 }
