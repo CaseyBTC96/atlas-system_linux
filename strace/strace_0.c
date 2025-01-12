@@ -40,8 +40,6 @@ int main(int argc, char **argv, char **env)
 
 int child_process(char *path, char **child_args, char **env)
 {
-	char *env[] = {NULL};
-
 	if (ptrace(PTRACE_TRACEME, 0, NULL, NULL) == -1)
 	{
 		perror("ptrace child");
