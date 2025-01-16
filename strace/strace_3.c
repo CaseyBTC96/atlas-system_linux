@@ -89,7 +89,7 @@ int parent_process(pid_t child)
 			}
 			else
 			{
-				printf(" = %#llx\n", regs.orig_rax);
+				printf("= %#llx\n", regs.rax);
 				entry = 0;
 			}
 		}
@@ -105,38 +105,32 @@ void print_params(struct user_regs_struct *regs, syscall_t const *callinfo)
 	size_t i;
 
 	printf("(");
-	for (i = 0; i <= callinfo->nb_params; i++)
+	if (callinfo->nb_params == 0)
+		printf("0");
+	else
 	{
-		if (callinfo->nb_params == 0)
-			printf("0");
-
-		switch(i)
+		for (i = 0; i < callinfo->nb_params; i++)
 		{
-			case(0):
-				break;
-			case(1):
-				printf("%#llx", regs->rdi);
-				break;
-			case(2):
-				printf("%#llx", regs->rsi);
-				break;
-			case(3):
-				printf("%#llx", regs->rdx);
-				break;
-			case(4):
-				printf("%#llx", regs->r10);
-				break;
-			case(5):
-				printf("%#llx", regs->r8);
-				break;
-			case(6):
-				printf("%#llx", regs->r9);
-				break;
-			default:
-				break;
+			switch(i)
+			{
+				case(0):
+					printf("%#llx", regs->rdi); break;
+				case(1):
+					printf("%#llx", regs->rsi); break;
+				case(2):
+					printf("%#llx", regs->rdx); break;
+				case(3):
+					printf("%#llx", regs->r10); break;
+				case(4):
+					printf("%#llx", regs->r8); break;
+				case(5):
+					printf("%#llx", regs->r9); break;
+				default:
+					printf("?????");
+			}
+			if (i != callinfo->nb_params - 1)
+				printf(", ");
 		}
-
-		if (i != 0 && i != callinfo->nb_params)
-			printf(", ");
 	}
+	printf(") ");
 }
