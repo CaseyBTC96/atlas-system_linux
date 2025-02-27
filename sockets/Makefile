@@ -11,7 +11,7 @@ BIN_DIR = bin
 # Source files for different todo_api versions
 TODO_API_0_SRC = $(SRC_DIR)/tcp_server.c
 TODO_API_1_SRC = $(SRC_DIR)/tcp_client.c
-TODO_API_2_SRC = $(SRC_DIR)/another_api.c  # Add actual source file names
+TODO_API_2_SRC = $(SRC_DIR)/another_api.c  # Change as needed
 TODO_API_3_SRC = $(SRC_DIR)/yet_another_api.c
 TODO_API_4_SRC = $(SRC_DIR)/more_api.c
 TODO_API_5_SRC = $(SRC_DIR)/final_api.c
