@@ -34,6 +34,13 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
 		return (EXIT_F);
 	}
+	sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	if (sockfd == -1)
+	{ /* Create a socket */
+		perror("socket"), freeaddrinfo(res);
+		return (EXIT_F);
+	}
+	for (p = res; p != NULL; p = p->ai_next)
 	{ /* Attempt to connect */
 		if (connect(sockfd, p->ai_addr, p->ai_addrlen) == 0)
 		{
