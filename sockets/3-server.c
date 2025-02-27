@@ -20,7 +20,7 @@ int main(void)
 	int sockfd, newsockfd;
 	struct sockaddr_in server_addr, client_addr;
 	socklen_t addr_len = sizeof(client_addr);
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE], client_ip[INET_ADDRSTRLEN];
 	ssize_t bytes_received;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); /* Create a socket */
@@ -52,8 +52,7 @@ int main(void)
 		perror("Accept failed");
 		close(sockfd);
 		exit(EXIT_FAILURE);
-	}
-	char client_ip[INET_ADDRSTRLEN]; /* Print the client's IP address */
+	} /* pint the client's IP address */
 	inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));
 	printf("Client connected: %s\n", client_ip);
 	/* Receive a message from the client */
