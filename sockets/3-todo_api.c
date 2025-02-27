@@ -16,13 +16,12 @@ void parse_http_body(char *query);
 
 int main(void)
 {
-	int socket_fd;
-	int connect;
+	int socket_fd, connect;
 	size_t bytes = 0;
 	char buffer[BUFFERSZ];
 	char path[PATHSZ];
 	struct sockaddr_in s_address;
-	socklen_t addrlen;
+	socklen_t addrlen = sizeof(s_address);
 
 	socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd == -1)
@@ -48,7 +47,6 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	addrlen = sizeof(s_address);
 	while (1)
 	{
 		connect = accept(socket_fd, (struct sockaddr *)&s_address, &addrlen);
@@ -79,40 +77,37 @@ int main(void)
 
 void parse_http_body(char *query)
 {
-	char *body_start;
-	char *line;
+	int i = 0;
+	char *token = NULL, *lines[16] = {0}, *body = NULL;
 
-	line = strtok(query, "\r\n");
-	while (line != NULL)
+	while ((token = strsep(&query, "\r\n")) != NULL)
 	{
-		line = strtok(NULL, "\r\n");
+		if (i < 16)
+		{
+			lines[i++] = token;
+		}
 	}
 
-	body_start = strstr(query, "\r\n\r\n");
-	if (body_start != NULL)
-	{
-		body_start += 4;
-		parse_http_parameters(body_start);
-	}
+	body = lines[i - 1];
+	parse_http_parameters(body);
 }
 
 void parse_http_parameters(char *query)
 {
-	char *key_value_pairs[16] = {0};
-	char key[50], value[50];
-	int i = 0, j;
-	char *pair;
+	int i = 0;
+	char *token = NULL, *key_vals[16] = {0}, key[50], val[50];
 
-	pair = strtok(query, "&");
-	while (pair && i < 16)
+	while ((token = strsep(&query, "&")) != NULL)
 	{
-		key_value_pairs[i++] = pair;
-		pair = strtok(NULL, "&");
+		if (i < 16 && token[0])
+		{
+			key_vals[i++] = token;
+		}
 	}
 
-	for (j = 0; j < i; j++)
+	for (i = 0; key_vals[i]; i++)
 	{
-		sscanf(key_value_pairs[j], "%[^=]=%s", key, value);
-		printf("Body param: \"%s\" -> \"%s\"\n", key, value);
+		sscanf(key_vals[i], "%[^=]=%s", key, val);
+		printf("Body param: \"%s\" -> \"%s\"\n", key, val);
 	}
 }
