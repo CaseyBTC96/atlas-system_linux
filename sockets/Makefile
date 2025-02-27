@@ -1,6 +1,6 @@
 # Compiler and flags
 CC      = gcc
-CFLAGS  = -Wall -Werror -Wextra -pedantic -std=gnu89 -g
+CFLAGS  = -Wall -Werror -Wextra -pedantic -std=c99 -g
 
 # Phony targets
 .PHONY: all todo_api_0 todo_api_1 todo_api_2 todo_api_3 todo_api_4 todo_api_5 clean
