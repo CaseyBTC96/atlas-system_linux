@@ -1,78 +1,43 @@
-# Compiler
-CC = gcc
+# Compiler and flags
+CC       = gcc
+CFLAGS   = -g3 -Wall -Werror -Wextra -pedantic
 
-# Compiler flags
-CFLAGS = -Wall -Wextra -pedantic
+# Output directories
+BIN_DIR   = bin
+OBJ_DIR   = obj
 
-# Directories
-SRC_DIR = src
-BIN_DIR = bin
+# Source files
+SRCS_SERVER = 0-server.c 1-server.c 3-server.c
+SRCS_CLIENT = 2-client.c
 
-# Source files for different todo_api versions
-TODO_API_0_SRC = $(SRC_DIR)/tcp_server.c
-TODO_API_1_SRC = $(SRC_DIR)/tcp_client.c
-TODO_API_2_SRC = $(SRC_DIR)/another_api.c  # Change as needed
-TODO_API_3_SRC = $(SRC_DIR)/yet_another_api.c
-TODO_API_4_SRC = $(SRC_DIR)/more_api.c
-TODO_API_5_SRC = $(SRC_DIR)/final_api.c
+# Object files
+OBJS_SERVER = $(SRCS_SERVER:%.c=$(OBJ_DIR)/%.o)
+OBJS_CLIENT = $(SRCS_CLIENT:%.c=$(OBJ_DIR)/%.o)
 
-# Output binaries for different todo_api versions
-TODO_API_0_BIN = $(BIN_DIR)/todo_api_0
-TODO_API_1_BIN = $(BIN_DIR)/todo_api_1
-TODO_API_2_BIN = $(BIN_DIR)/todo_api_2
-TODO_API_3_BIN = $(BIN_DIR)/todo_api_3
-TODO_API_4_BIN = $(BIN_DIR)/todo_api_4
-TODO_API_5_BIN = $(BIN_DIR)/todo_api_5
+# Create output directories if they do not exist
+$(shell mkdir -p $(BIN_DIR) $(OBJ_DIR))
 
-# Default target
-all: $(TODO_API_0_BIN) $(TODO_API_1_BIN) $(TODO_API_2_BIN) $(TODO_API_3_BIN) $(TODO_API_4_BIN) $(TODO_API_5_BIN)
+# Targets
+all: $(BIN_DIR)/0-server $(BIN_DIR)/1-server $(BIN_DIR)/2-client $(BIN_DIR)/3-server
 
-# Individual targets
-todo_api_0: $(TODO_API_0_BIN)
-	@echo "Built todo_api_0."
+$(BIN_DIR)/0-server: $(OBJS_SERVER)
+	$(CC) $(CFLAGS) -o $@ $^
 
-todo_api_1: $(TODO_API_1_BIN)
-	@echo "Built todo_api_1."
+$(BIN_DIR)/1-server: $(OBJ_DIR)/1-server.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-todo_api_2: $(TODO_API_2_BIN)
-	@echo "Built todo_api_2."
+$(BIN_DIR)/2-client: $(OBJ_DIR)/2-client.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-todo_api_3: $(TODO_API_3_BIN)
-	@echo "Built todo_api_3."
+$(BIN_DIR)/3-server: $(OBJ_DIR)/3-server.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-todo_api_4: $(TODO_API_4_BIN)
-	@echo "Built todo_api_4."
+# Object file rules
+$(OBJ_DIR)/%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-todo_api_5: $(TODO_API_5_BIN)
-	@echo "Built todo_api_5."
-
-# Rules to build binaries
-$(TODO_API_0_BIN): $(TODO_API_0_SRC)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(TODO_API_1_BIN): $(TODO_API_1_SRC)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(TODO_API_2_BIN): $(TODO_API_2_SRC)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(TODO_API_3_BIN): $(TODO_API_3_SRC)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(TODO_API_4_BIN): $(TODO_API_4_SRC)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(TODO_API_5_BIN): $(TODO_API_5_SRC)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-# Clean up built binaries
+# Clean up build artifacts
 clean:
-	rm -rf $(BIN_DIR)
+	rm -rf $(OBJ_DIR)/*.o $(BIN_DIR)/*
 
-.PHONY: all clean todo_api_0 todo_api_1 todo_api_2 todo_api_3 todo_api_4 todo_api_5
+.PHONY: all clean
