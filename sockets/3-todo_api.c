@@ -77,7 +77,7 @@ char *make_response(char *address, char *request)
 	printf("Raw request: \"%s\"\n", request);
 	parse_http_parameters(request);
 	fflush(stdout);
-	return strdup(RESPONSE);
+	return (address); 
 }
 
 void parse_http_parameters(char *request)
