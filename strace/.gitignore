@@ -1,7 +1,7 @@
-testing/
-*.out
-*.swp
-strace_0
-strace_1
-strace_2
-strace_3
+*
+!*/
+!.gitignore
+!Makefile
+!README.md
+!*.c
+!*.h
